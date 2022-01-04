@@ -1,11 +1,39 @@
-import { useState } from "react"
+import { db } from '../services/firebase'
+import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useState } from "react"
 
 export function Home() {
   const [sistolicAP, setSistolicAP] = useState('')
   const [dialosticAP, setDialosticAP] = useState('')
 
-  function handleAddArterialPression() {
-    console.log(sistolicAP, dialosticAP)
+  const [arterialPression, setArterialPression] = useState<any>([])
+
+  async function loadData() {
+    const docRef = collection(db, "pressao_arterial");
+    const unsubscribe = onSnapshot(docRef, (querySnapshot) => {
+      const data = querySnapshot.docs.map(doc => {
+        return {
+          id: doc.id, 
+          ...doc.data() 
+        }
+      })
+
+      setArterialPression(data)
+    })
+
+    return () => { unsubscribe() }
+  }
+  
+    useEffect(() => {
+      loadData()
+    }, [])
+
+  async function handleAddArterialPression() {
+    await addDoc(collection(db, 'pressao_arterial'), {
+      dialostic_pression: dialosticAP,
+      sistolic_pression: sistolicAP,
+      datetime: new Date()
+    })
   }
 
   return (
@@ -38,25 +66,40 @@ export function Home() {
       <div className="flex flex-row justify-around">
         <h3
           className="text-white bg-blue-400 rounded-md mt-2 p-2 w-40 text-center"
-        >Pressão sistólica</h3>
+        >
+          Pressão sistólica
+        </h3>
         <h3
           className="text-white bg-blue-400 rounded-md mt-2 p-2 w-40 text-center"
-        >Pressão dialóstica</h3>
+        >
+          Pressão dialóstica
+        </h3>
         <h3
           className="text-white bg-blue-400 rounded-md mt-2 p-2 w-40 text-center"
-        >Data de Auferição</h3>
+        >
+          Data de Auferição
+        </h3>
       </div>
-      <div className="flex flex-row justify-around">
+      {arterialPression.map((data: any) => (
+        <div key={data.id} className="flex flex-row justify-around">
         <h3
           className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 text-center"
-        >120</h3>
+        >
+          {data.sistolic_pression}
+        </h3>
         <h3
           className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 text-center"
-        >80</h3>
+        >
+          {data.dialostic_pression}
+        </h3>
         <h3
           className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 text-center"
-        >02/01/2022</h3>
+        >
+          {new Date(data.datetime.seconds * 1000).toLocaleDateString()}
+        </h3>
       </div>
+      ))}
+      
     </>
   )
 }
