@@ -13,11 +13,10 @@ export function Home() {
     const unsubscribe = onSnapshot(docRef, (querySnapshot) => {
       const data = querySnapshot.docs.map(doc => {
         return {
-          id: doc.id, 
+          id: doc.id,
           ...doc.data() 
         }
       })
-
       setArterialPression(data)
     })
 
@@ -39,7 +38,7 @@ export function Home() {
   return (
     <>
       <div className="w-full bg-blue-400 h-36 flex justify-center items-center">
-        <h2 className="text-white font-medium">Controle diário de pressão arterial</h2>
+        <h2 className="text-white text-3xl font-bold">Controle diário de pressão arterial</h2>
       </div>
       <div className="flex flex-row justify-around">
         <input
@@ -83,19 +82,21 @@ export function Home() {
       {arterialPression.map((data: any) => (
         <div key={data.id} className="flex flex-row justify-around">
         <h3
-          className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 text-center"
+          className="text-white text-2xl bg-blue-300 rounded-md mt-2 p-2 w-40 text-center flex justify-center items-center"
         >
           {data.sistolic_pression}
         </h3>
         <h3
-          className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 text-center"
+          className="text-white text-2xl bg-blue-300 rounded-md mt-2 p-2 w-40 flex justify-center items-center text-center"
         >
           {data.dialostic_pression}
         </h3>
         <h3
-          className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 text-center"
+          className="text-white bg-blue-300 rounded-md mt-2 p-2 w-40 flex justify-center items-center text-center"
         >
-          {new Date(data.datetime.seconds * 1000).toLocaleDateString()}
+          {new Date(data.datetime.seconds * 1000).toLocaleDateString('pt-BR')}
+          {" às "}
+          {new Date(data.datetime.seconds * 1000).toLocaleTimeString('pt-BR')}
         </h3>
       </div>
       ))}
